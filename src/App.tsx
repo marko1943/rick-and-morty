@@ -4,6 +4,7 @@ import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { ListPage } from "./pages/ListPage/ListPage";
 import { ErrorBoundary } from "react-error-boundary";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { DetailsPage } from "./pages/DetailsPage/DetailsPage";
 import styles from "./App.module.scss";
 
 const ErrorBoundaryLayout = () => (
@@ -24,6 +25,11 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <ListPage />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/:dataType/:id",
+        element: <DetailsPage />,
         errorElement: <ErrorPage />,
       },
     ],

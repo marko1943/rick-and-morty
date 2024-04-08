@@ -38,9 +38,23 @@ const ListPage = () => {
     },
   });
 
+  // set only the first tab to active
+  const resetTabs = () => {
+    const newTabs = [...tabs];
+    // could be done with a map, but this is ok for now
+    newTabs[0].active = true;
+    newTabs[1].active = false;
+    newTabs[2].active = false;
+
+    setTabs(newTabs);
+  };
+
   // only fire on first render
+  // in ideal case we'd want to return to whichever tab was active and whichever page
+  // but again it's too much work for this project
   useEffect(() => {
     getCharacters();
+    resetTabs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

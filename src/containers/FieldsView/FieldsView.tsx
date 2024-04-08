@@ -1,5 +1,7 @@
 import { Action } from "../../components/Action/Action";
 import { Field } from "../../types";
+import { useNavigate } from "react-router-dom";
+
 import styles from "./FieldsView.module.scss";
 
 const FieldsView = ({
@@ -13,6 +15,12 @@ const FieldsView = ({
   loading: boolean;
   error: any;
 }) => {
+  const navigate = useNavigate();
+
+  const handleClick = (id: string, type: string) => {
+    navigate(`/${type}/${id}`);
+  };
+
   return (
     <>
       {loading ? (
@@ -42,10 +50,10 @@ const FieldsView = ({
                         <Action
                           key={field.id}
                           takeAction={() => {
-                            console.log("Action clicked", {
-                              id: value.id,
-                              type: value.__typename,
-                            });
+                            handleClick(
+                              value.id,
+                              value.__typename.toLowerCase()
+                            );
                           }}
                         />
                       )
