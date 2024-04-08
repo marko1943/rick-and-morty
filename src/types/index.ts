@@ -1,6 +1,7 @@
 export type Field = {
   id: string;
   name: string;
+  // toDO maybe we dont need
   type: "Characters" | "Locations" | "Episodes";
 };
 

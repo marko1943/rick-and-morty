@@ -6,10 +6,13 @@
     width: 100%;
     padding: 2rem;
   }
+  th {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
   th,
   tr,
   td {
-    width: 200px;
     padding-left: 10px;
   }
   tr {
@@ -20,7 +23,6 @@
     td {
       max-width: 200px;
       border-right: 1px solid var(--border-color);
-      font-weight: normal;
       &:last-child {
         border-right: none;
       }

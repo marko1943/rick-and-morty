@@ -3,6 +3,7 @@ import ErrorPage from "./pages/ErrorPage/ErrorPage";
 import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { ListPage } from "./pages/ListPage/ListPage";
 import { ErrorBoundary } from "react-error-boundary";
+import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import styles from "./App.module.scss";
 
 const ErrorBoundaryLayout = () => (
@@ -11,6 +12,11 @@ const ErrorBoundaryLayout = () => (
   </ErrorBoundary>
 );
 
+const client = new ApolloClient({
+  uri: "https://rickandmortyapi.com/graphql",
+  cache: new InMemoryCache(),
+});
+
 const router = createBrowserRouter([
   {
     element: <ErrorBoundaryLayout />,
@@ -18,6 +24,7 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <ListPage />,
+        errorElement: <ErrorPage />,
       },
     ],
   },
@@ -27,7 +34,9 @@ export const App = () => {
   return (
     <div data-testid="App" className={styles.App}>
       <React.StrictMode>
-        <RouterProvider router={router} />
+        <ApolloProvider client={client}>
+          <RouterProvider router={router} />
+        </ApolloProvider>
       </React.StrictMode>
     </div>
   );
