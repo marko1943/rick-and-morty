@@ -1,0 +1,29 @@
+.FieldsView {
+  width: 100%;
+  display: flex;
+  padding: 2rem;
+  table {
+    width: 100%;
+    padding: 2rem;
+  }
+  th,
+  tr,
+  td {
+    width: 200px;
+    padding-left: 10px;
+  }
+  tr {
+    text-align: left;
+  }
+
+  tbody {
+    td {
+      max-width: 200px;
+      border-right: 1px solid var(--border-color);
+      font-weight: normal;
+      &:last-child {
+        border-right: none;
+      }
+    }
+  }
+}
