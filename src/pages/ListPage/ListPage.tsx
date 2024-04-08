@@ -8,33 +8,52 @@ import { GET_EPISODES } from "../../graphql/queries/Episodes.query";
 import { GET_LOCATIONS } from "../../graphql/queries/Locations.query";
 
 import styles from "./ListPage.module.scss";
+import { Pagination } from "../../components/Pagination/Pagination";
 
 const ListPage = () => {
   const [tabs, setTabs] = useState<Array<ITab>>(TabsEnum);
+  const [activeTab, setActiveTab] = useState<ITab>(tabs[0]);
   const [fields, setFields] = useState<Field[]>(tabs[0].fields!);
   const [data, setData] = useState<Record<string, string>[]>([]);
+  const [pages, setPages] = useState<number>(1);
+  const [page, setPage] = useState<number>(1);
 
   const [getCharacters, { loading, error }] = useLazyQuery(GET_CHARACTERS, {
-    variables: { page: 1 },
+    variables: { page },
     fetchPolicy: "cache-and-network",
     onCompleted: (res) => {
-      setData(res.characters.results);
+      // Why this check?
+      // because there appears to be race condition inside of useLazyQuery
+      // it fires the onCompleted randomly, callback even if it's not being called
+      // maybe because of fetchPolicy: "cache-and-network"
+      // so we need to check if the tab is active
+      // ideally this would be done differently but I have no time to investigate
+      if (activeTab.name === "Characters") {
+        setPages(res.characters.info.pages);
+        setData(res.characters.results);
+      }
     },
   });
 
   const [getLocations] = useLazyQuery(GET_LOCATIONS, {
-    variables: { page: 1 },
+    variables: { page },
     fetchPolicy: "cache-and-network",
     onCompleted: (res) => {
-      setData(res.locations.results);
+      if (activeTab.name === "Locations") {
+        setPages(res.locations.info.pages);
+        setData(res.locations.results);
+      }
     },
   });
 
   const [getEpisodes] = useLazyQuery(GET_EPISODES, {
-    variables: { page: 1 },
+    variables: { page },
     fetchPolicy: "cache-and-network",
     onCompleted: (res) => {
-      setData(res.episodes.results);
+      if (activeTab.name === "Episodes") {
+        setPages(res.episodes.info.pages);
+        setData(res.episodes.results);
+      }
     },
   });
 
@@ -63,15 +82,9 @@ const ListPage = () => {
       const newTabs = [...tabs];
       newTabs.map((tab: ITab) => {
         if (tab.id === id) {
-          setFields(tab.fields!);
           tab.active = true;
-          if (tab.name === "Episodes") {
-            getEpisodes();
-          } else if (tab.name === "Locations") {
-            getLocations();
-          } else {
-            getCharacters();
-          }
+          setFields(tab.fields!);
+          setActiveTab(tab);
         } else {
           tab.active = false;
         }
@@ -79,8 +92,32 @@ const ListPage = () => {
       });
       setTabs(newTabs);
     },
-    [getCharacters, getEpisodes, getLocations, tabs]
+    [tabs]
   );
+
+  useEffect(() => {
+    if (activeTab.name === "Episodes") {
+      setPage(1);
+      getEpisodes();
+    } else if (activeTab.name === "Locations") {
+      setPage(1);
+      getLocations();
+    } else {
+      setPage(1);
+      getCharacters();
+    }
+  }, [activeTab.name, getCharacters, getEpisodes, getLocations]);
+
+  const onNumberClick = (num: number) => {
+    setPage(num);
+    if (activeTab.name === "Characters") {
+      getCharacters({ variables: { page: num } });
+    } else if (activeTab.name === "Episodes") {
+      getEpisodes({ variables: { page: num } });
+    } else {
+      getLocations({ variables: { page: num } });
+    }
+  };
 
   return (
     <div className={styles.ListPage}>
@@ -91,6 +128,11 @@ const ListPage = () => {
         error={error}
         fields={fields}
         values={data}
+      />
+      <Pagination
+        currentPage={page}
+        selectNumber={onNumberClick}
+        pages={pages}
       />
     </div>
   );

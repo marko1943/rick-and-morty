@@ -11,7 +11,7 @@ const TabsView = ({
 }) => {
   return (
     <div className={styles.TabsView}>
-      {tabs.map((tab: ITab) => (
+      {[...tabs].map((tab: ITab) => (
         <Tab
           setTab={handleClick}
           key={tab.id}
