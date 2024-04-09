@@ -7,6 +7,7 @@ type Props = ITab & {
 const Tab = ({ id, name, active, setTab }: Props) => {
   return (
     <div
+      data-testid="tab-testid"
       className={active ? `${styles.Tab} ${styles.Active}` : `${styles.Tab}`}
       onClick={() => setTab(id)}
     >
