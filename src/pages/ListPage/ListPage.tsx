@@ -19,15 +19,8 @@ const ListPage = () => {
   const [page, setPage] = useState<number>(1);
 
   const [getCharacters, { loading, error }] = useLazyQuery(GET_CHARACTERS, {
-    variables: { page },
     fetchPolicy: "cache-and-network",
     onCompleted: (res) => {
-      // Why this check?
-      // because there appears to be race condition inside of useLazyQuery
-      // it fires the onCompleted randomly, callback even if it's not being called
-      // maybe because of fetchPolicy: "cache-and-network"
-      // so we need to check if the tab is active
-      // ideally this would be done differently but I have no time to investigate
       if (activeTab.name === "Characters") {
         setPages(res.characters.info.pages);
         setData(res.characters.results);
@@ -36,7 +29,6 @@ const ListPage = () => {
   });
 
   const [getLocations] = useLazyQuery(GET_LOCATIONS, {
-    variables: { page },
     fetchPolicy: "cache-and-network",
     onCompleted: (res) => {
       if (activeTab.name === "Locations") {
@@ -47,7 +39,6 @@ const ListPage = () => {
   });
 
   const [getEpisodes] = useLazyQuery(GET_EPISODES, {
-    variables: { page },
     fetchPolicy: "cache-and-network",
     onCompleted: (res) => {
       if (activeTab.name === "Episodes") {
@@ -77,8 +68,9 @@ const ListPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleClick = useCallback(
+  const onTabsClick = useCallback(
     (id: string) => {
+      setPage(1);
       const newTabs = [...tabs];
       newTabs.map((tab: ITab) => {
         if (tab.id === id) {
@@ -97,16 +89,13 @@ const ListPage = () => {
 
   useEffect(() => {
     if (activeTab.name === "Episodes") {
-      setPage(1);
-      getEpisodes();
+      getEpisodes({ variables: { page } });
     } else if (activeTab.name === "Locations") {
-      setPage(1);
-      getLocations();
+      getLocations({ variables: { page } });
     } else {
-      setPage(1);
-      getCharacters();
+      getCharacters({ variables: { page } });
     }
-  }, [activeTab.name, getCharacters, getEpisodes, getLocations]);
+  }, [activeTab.name, getCharacters, getEpisodes, getLocations, page]);
 
   const onNumberClick = (num: number) => {
     setPage(num);
@@ -121,7 +110,7 @@ const ListPage = () => {
 
   return (
     <div className={styles.ListPage}>
-      <TabsView handleClick={handleClick} tabs={tabs} />
+      <TabsView handleClick={onTabsClick} tabs={tabs} />
 
       <FieldsView
         loading={loading}
