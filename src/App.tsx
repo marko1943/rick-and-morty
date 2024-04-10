@@ -18,23 +18,28 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      element: <ErrorBoundaryLayout />,
+      children: [
+        {
+          path: "/",
+          element: <ListPage />,
+          errorElement: <ErrorPage />,
+        },
+        {
+          path: "/:dataType/:id",
+          element: <DetailsPage />,
+          errorElement: <ErrorPage />,
+        },
+      ],
+    },
+  ],
   {
-    element: <ErrorBoundaryLayout />,
-    children: [
-      {
-        path: "/",
-        element: <ListPage />,
-        errorElement: <ErrorPage />,
-      },
-      {
-        path: "/:dataType/:id",
-        element: <DetailsPage />,
-        errorElement: <ErrorPage />,
-      },
-    ],
-  },
-]);
+    basename: "/perdoo-rick-and-morty/",
+  }
+);
 
 export const App = () => {
   return (
