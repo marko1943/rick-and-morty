@@ -1,3 +1,9 @@
+# Rick and Morty
+
+Simple web page with simple components that lists Rick and Morty characters in a table.
+
+Why did you even do this Marko? Why do you care bro.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
